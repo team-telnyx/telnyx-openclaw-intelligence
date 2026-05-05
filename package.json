@@ -1,0 +1,68 @@
+{
+  "name": "telnyx-openclaw-intelligence",
+  "version": "0.1.0",
+  "description": "Telnyx text-inference provider for OpenClaw — native OpenAI-compatible webchat completions via Telnyx AI, no LiteLLM proxy needed",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "ocplatform": {
+    "extensions": [
+      "./dist/index.js"
+    ]
+  },
+  "openclaw": {
+    "extensions": [
+      "./dist/index.js"
+    ],
+    "compat": {
+      "pluginApi": "2026.4"
+    },
+    "build": {
+      "openclawVersion": "2026.4.24"
+    }
+  },
+  "files": [
+    "dist",
+    "openclaw.plugin.json",
+    "README.md",
+    "LICENSE",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "telnyx",
+    "ai",
+    "llm",
+    "text-inference",
+    "webchat-completions",
+    "intelligence-provider"
+  ],
+  "author": "Ifthikar Razik <ifthikar@telnyx.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/team-telnyx/telnyx-openclaw-intelligence.git"
+  },
+  "bugs": {
+    "url": "https://github.com/team-telnyx/telnyx-openclaw-intelligence/issues"
+  },
+  "homepage": "https://github.com/team-telnyx/telnyx-openclaw-intelligence#readme",
+  "peerDependencies": {
+    "openclaw": ">=2026.4.0"
+  },
+  "devDependencies": {
+    "openclaw": "^2026.4.24",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.5"
+  },
+  "engines": {
+    "node": ">=22.14.0"
+  }
+}
