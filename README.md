@@ -120,7 +120,7 @@ Or configure it in `openclaw.json`:
 ## API Endpoint
 
 ```
-POST https://api.telnyx.com/v2/ai/openai/chat/completions
+POST https://api.telnyx.com/v2/ai/chat/completions
 Authorization: Bearer TELNYX_API_KEY
 Content-Type: application/json
 ```
@@ -143,7 +143,7 @@ Content-Type: application/json
 ### Live smoke test
 
 ```bash
-curl -s -X POST https://api.telnyx.com/v2/ai/openai/chat/completions \
+curl -s -X POST https://api.telnyx.com/v2/ai/chat/completions \
   -H "Authorization: Bearer $TELNYX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

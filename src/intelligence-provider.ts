@@ -5,7 +5,7 @@
  * handled natively — no LiteLLM proxy required.
  *
  * The Telnyx Inference API exposes an OpenAI-compatible chat-completions
- * endpoint at `/v2/ai/openai/chat/completions`, so we use OpenClaw's built-in
+ * endpoint at `/v2/ai/chat/completions`, so we use OpenClaw's built-in
  * `openai-completions` transport instead of maintaining a custom fetch/SSE
  * transport.
  *
@@ -37,8 +37,8 @@ const LEGACY_WEBCHAT_COMPLETIONS_PATH = "/webchat/completions";
 /**
  * Normalize the Telnyx base URL.
  *
- * Telnyx uses `https://api.telnyx.com/v2/ai/openai` as the OpenAI-compatible
- * root. OpenClaw's `openai-completions` transport appends `/chat/completions`.
+ * Telnyx uses `https://api.telnyx.com/v2/ai` as the AI API root.
+ * OpenClaw's `openai-completions` transport appends `/chat/completions`.
  * If the caller pasted a full completions URL, strip only the endpoint suffix.
  */
 export function normalizeTelnyxBaseUrl(baseUrl?: string): string {

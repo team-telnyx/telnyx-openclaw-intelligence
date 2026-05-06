@@ -3,12 +3,12 @@
  *
  * Runtime requests are handled by OpenClaw's built-in `openai-completions`
  * transport. That transport appends `/chat/completions` to the configured
- * base URL, so the Telnyx OpenAI-compatible base URL must be:
- *   https://api.telnyx.com/v2/ai/openai
+ * base URL, so the canonical Telnyx AI base URL is:
+ *   https://api.telnyx.com/v2/ai
  */
 
-/** Telnyx OpenAI-compatible Inference API base URL. */
-export const TELNYX_INFERENCE_BASE_URL = "https://api.telnyx.com/v2/ai/openai";
+/** Telnyx AI Inference API base URL used by OpenClaw's OpenAI-compatible transport. */
+export const TELNYX_INFERENCE_BASE_URL = "https://api.telnyx.com/v2/ai";
 
 /** Default model used when none is configured. */
 export const TELNYX_DEFAULT_MODEL = "meta-llama/Meta-Llama-3.1-70B-Instruct";

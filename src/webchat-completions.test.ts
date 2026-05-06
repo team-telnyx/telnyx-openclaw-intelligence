@@ -51,26 +51,26 @@ describe("normalizeTelnyxModelId", () => {
 // ── Base URL normalization ────────────────────────────────────────────
 
 describe("normalizeTelnyxBaseUrl", () => {
-  it("uses the Telnyx OpenAI-compatible base URL by default", () => {
+  it("uses the canonical Telnyx AI base URL by default", () => {
     expect(normalizeTelnyxBaseUrl()).toBe(TELNYX_INFERENCE_BASE_URL);
   });
 
-  it("preserves the OpenAI-compatible base URL", () => {
-    expect(normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai/openai")).toBe(
-      "https://api.telnyx.com/v2/ai/openai",
+  it("preserves the canonical Telnyx AI base URL", () => {
+    expect(normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai")).toBe(
+      "https://api.telnyx.com/v2/ai",
     );
   });
 
   it("strips the chat completions suffix when a full URL is provided", () => {
     expect(
-      normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai/openai/chat/completions"),
-    ).toBe("https://api.telnyx.com/v2/ai/openai");
+      normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai/chat/completions"),
+    ).toBe("https://api.telnyx.com/v2/ai");
   });
 
   it("strips the legacy webchat completions suffix when a full URL is provided", () => {
     expect(
-      normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai/openai/webchat/completions"),
-    ).toBe("https://api.telnyx.com/v2/ai/openai");
+      normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai/webchat/completions"),
+    ).toBe("https://api.telnyx.com/v2/ai");
   });
 });
 

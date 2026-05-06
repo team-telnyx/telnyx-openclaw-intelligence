@@ -7,7 +7,7 @@
  * no LiteLLM proxy required. Just set TELNYX_API_KEY.
  *
  * Architecture:
- * - Endpoint: https://api.telnyx.com/v2/ai/openai/chat/completions
+ * - Endpoint: https://api.telnyx.com/v2/ai/chat/completions
  * - Transport: Standard OpenAI-compatible (api: "openai-completions")
  * - Auth: Bearer TELNYX_API_KEY
  * - Models: meta-llama, Qwen, Kimi, MiniMax, GLM, Gemma, OpenAI, Claude, Gemini, Groq, and more
