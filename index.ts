@@ -7,10 +7,10 @@
  * no LiteLLM proxy required. Just set TELNYX_API_KEY.
  *
  * Architecture:
- * - Endpoint: https://api.telnyx.com/v2/ai/openai/webchat/completions
+ * - Endpoint: https://api.telnyx.com/v2/ai/openai/chat/completions
  * - Transport: Standard OpenAI-compatible (api: "openai-completions")
  * - Auth: Bearer TELNYX_API_KEY
- * - Models: meta-llama, deepseek, mistral, google/gemma, and more
+ * - Models: meta-llama, Qwen, Kimi, MiniMax, GLM, Gemma, OpenAI, Claude, Gemini, Groq, and more
  * - Streaming: SSE (standard OpenAI format)
  */
 
@@ -22,7 +22,7 @@ export default definePluginEntry({
   name: "Telnyx Intelligence Provider",
   description:
     "Native Telnyx AI text-inference provider for OpenClaw. " +
-    "OpenAI-compatible webchat completions — just set TELNYX_API_KEY.",
+    "OpenAI-compatible chat completions — just set TELNYX_API_KEY.",
 
   register(api) {
     api.registerProvider(buildTelnyxIntelligenceProvider());

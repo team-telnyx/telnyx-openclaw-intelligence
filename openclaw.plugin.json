@@ -1,7 +1,7 @@
 {
   "id": "telnyx-intelligence",
   "name": "Telnyx Intelligence",
-  "description": "Telnyx text-inference provider for OpenClaw — native OpenAI-compatible webchat completions via the Telnyx AI API. Just set TELNYX_API_KEY.",
+  "description": "Telnyx text-inference provider for OpenClaw — native OpenAI-compatible chat completions via the Telnyx AI API. Just set TELNYX_API_KEY.",
   "enabledByDefault": true,
   "providers": ["telnyx"],
   "setup": {
@@ -19,7 +19,7 @@
       "method": "api-key",
       "choiceId": "telnyx-api-key",
       "choiceLabel": "Telnyx API key",
-      "choiceHint": "Native webchat completions via Telnyx AI (OpenAI-compatible)",
+      "choiceHint": "Native chat completions via Telnyx AI (OpenAI-compatible)",
       "assistantPriority": 30,
       "groupId": "telnyx",
       "groupLabel": "Telnyx AI",

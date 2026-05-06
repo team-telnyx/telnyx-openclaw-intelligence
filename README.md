@@ -2,12 +2,12 @@
 
 **Native Telnyx AI text-inference provider for OpenClaw.**
 
-Routes webchat completion requests directly to the [Telnyx AI Inference API](https://developers.telnyx.com/docs/inference) — no LiteLLM proxy needed.
+Routes OpenAI-compatible chat completion requests directly to the [Telnyx AI Inference API](https://developers.telnyx.com/docs/inference) — no LiteLLM proxy needed.
 
 - OpenAI-compatible API endpoint
 - Full streaming (SSE) support
 - Bearer token auth via `TELNYX_API_KEY`
-- Access to open-weight models: Llama 4, Llama 3.x, DeepSeek R1/V3, Mistral, Gemma, and more
+- Access to the live Telnyx AI model catalog: Llama 3.x, Qwen, Kimi, MiniMax, GLM, Gemma, OpenAI GPT, Claude, Gemini, Groq OSS, and more
 
 ---
 
@@ -30,7 +30,7 @@ openclaw plugins install /path/to/telnyx-openclaw-intelligence
 Or from your project root:
 
 ```bash
-cd ~/projects/telnyx-ocplatform-intelligence
+cd ~/projects/telnyx-openclaw-intelligence
 npm install && npm run build
 openclaw plugins install .
 ```
@@ -90,19 +90,29 @@ Or configure it in `openclaw.json`:
 
 | Model | Notes |
 |-------|-------|
-| `meta-llama/Meta-Llama-3.1-70B-Instruct` | **Default** — strong general-purpose, 99k ctx |
-| `meta-llama/Meta-Llama-3.1-8B-Instruct` | Fast, lightweight, 131k ctx |
-| `meta-llama/Llama-3.3-70B-Instruct` | Latest Llama 3.x generation, 99k ctx |
-| `Qwen/Qwen3-235B-A22B` | 235B MoE, strong reasoning, 32k ctx |
-| `moonshotai/Kimi-K2.6` | 1T params, 262k ctx, vision |
-| `moonshotai/Kimi-K2.5` | 1T params, 256k ctx, vision |
-| `MiniMaxAI/MiniMax-M2.7` | 200k ctx |
-| `zai-org/GLM-5.1-FP8` | 754B params, 202k ctx |
-| `google/gemma-2b-it` | Tiny, fast, 8k ctx |
+| `meta-llama/Meta-Llama-3.1-70B-Instruct` | **Default** — strong general-purpose Llama 3.1 model |
+| `meta-llama/Meta-Llama-3.1-8B-Instruct` | Fast, lightweight Llama 3.1 model |
+| `meta-llama/Llama-3.3-70B-Instruct` | Llama 3.3 generation model |
+| `Qwen/Qwen3-235B-A22B` | Large MoE reasoning model |
+| `moonshotai/Kimi-K2.6` | Long-context Kimi model |
+| `moonshotai/Kimi-K2.5` | Long-context Kimi model |
+| `MiniMaxAI/MiniMax-M2.7` | Long-context MiniMax model |
+| `zai-org/GLM-5.1-FP8` | GLM model |
+| `google/gemma-2b-it` | Tiny, fast Gemma model |
+| `openai/gpt-5` | OpenAI GPT-5 |
+| `openai/gpt-5.1` | OpenAI GPT-5.1 |
+| `openai/gpt-5.2` | OpenAI GPT-5.2 |
+| `openai/gpt-4.1` | OpenAI GPT-4.1 |
+| `openai/gpt-4o` | OpenAI GPT-4o |
+| `openai/gpt-4o-mini` | OpenAI GPT-4o mini |
+| `anthropic/claude-haiku-4-5` | Claude Haiku |
+| `anthropic/claude-opus-4-6` | Claude Opus |
+| `google/gemini-2.5-flash` | Gemini Flash |
+| `Groq/gpt-oss-120b` | Groq-hosted OSS model |
 
 > **Note:** The model list evolves as Telnyx adds/removes models. Use the Telnyx models endpoint to see the current list:
 > ```bash
-> curl -s https://api.telnyx.com/v2/ai/openai/models -H "Authorization: Bearer $TELNYX_API_KEY" | jq '.data[].id'
+> curl -s https://api.telnyx.com/v2/ai/models -H "Authorization: Bearer $TELNYX_API_KEY" | jq '.data[].id'
 > ```
 
 ---
@@ -110,7 +120,7 @@ Or configure it in `openclaw.json`:
 ## API Endpoint
 
 ```
-POST https://api.telnyx.com/v2/ai/openai/webchat/completions
+POST https://api.telnyx.com/v2/ai/openai/chat/completions
 Authorization: Bearer TELNYX_API_KEY
 Content-Type: application/json
 ```
@@ -133,7 +143,7 @@ Content-Type: application/json
 ### Live smoke test
 
 ```bash
-curl -s -X POST https://api.telnyx.com/v2/ai/openai/webchat/completions \
+curl -s -X POST https://api.telnyx.com/v2/ai/openai/chat/completions \
   -H "Authorization: Bearer $TELNYX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -165,12 +175,12 @@ npm run lint
 ### Project structure
 
 ```
-telnyx-ocplatform-intelligence/
+telnyx-openclaw-intelligence/
 ├── index.ts                        # Plugin entry point
 ├── src/
 │   ├── intelligence-provider.ts    # Provider registration (registerProvider)
-│   ├── webchat-completions.ts         # Transport helpers (model normalization, SSE)
-│   └── webchat-completions.test.ts    # Unit tests (6+ test suites)
+│   ├── webchat-completions.ts         # Shared Telnyx model/provider helpers
+│   └── webchat-completions.test.ts    # Unit tests for model/base URL/catalog behavior
 ├── openclaw.plugin.json          # Plugin manifest
 ├── package.json
 ├── tsconfig.json                   # Lint (noEmit)
@@ -194,7 +204,7 @@ telnyx-ocplatform-intelligence/
 ## Related Plugins
 
 - [telnyx-openclaw-tts](../telnyx-openclaw-tts) — AIF-122, Telnyx TTS
-- [telnyx-ocplatform-stt](../telnyx-ocplatform-stt) — AIF-123, Telnyx STT
+- [telnyx-openclaw-stt](../telnyx-openclaw-stt) — AIF-123, Telnyx STT
 - [telnyx-openclaw-embeddings](../telnyx-openclaw-embeddings) — AIF-124, Telnyx embeddings
 
 ---

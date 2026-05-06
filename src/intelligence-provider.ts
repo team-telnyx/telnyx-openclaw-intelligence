@@ -4,9 +4,10 @@
  * Registers Telnyx as a first-class text-inference provider. Routing is
  * handled natively — no LiteLLM proxy required.
  *
- * The Telnyx Inference API is OpenAI-compatible, so we use the standard
- * `normalizeConfig` / `normalizeResolvedModel` / `normalizeTransport`
- * pattern used by Arcee, OpenCode-Go, and similar providers.
+ * The Telnyx Inference API exposes an OpenAI-compatible chat-completions
+ * endpoint at `/v2/ai/openai/chat/completions`, so we use OpenClaw's built-in
+ * `openai-completions` transport instead of maintaining a custom fetch/SSE
+ * transport.
  *
  * Authentication:
  *   Priority: 1. models.providers.telnyx.apiKey  2. TELNYX_API_KEY env var
@@ -30,40 +31,54 @@ import {
 
 const PROVIDER_ID = "telnyx" as const;
 
-/** Path suffix for the Telnyx Inference OpenAI-compat endpoint. */
-const TELNYX_OPENAI_PATH = "/openai";
+const CHAT_COMPLETIONS_PATH = "/chat/completions";
+const LEGACY_WEBCHAT_COMPLETIONS_PATH = "/webchat/completions";
 
 /**
  * Normalize the Telnyx base URL.
  *
- * Telnyx uses `https://api.telnyx.com/v2/ai` as the root. If the caller
- * has set the full OpenAI-compat path, strip it — the transport appends
- * the correct path itself.
+ * Telnyx uses `https://api.telnyx.com/v2/ai/openai` as the OpenAI-compatible
+ * root. OpenClaw's `openai-completions` transport appends `/chat/completions`.
+ * If the caller pasted a full completions URL, strip only the endpoint suffix.
  */
 export function normalizeTelnyxBaseUrl(baseUrl?: string): string {
   if (!baseUrl?.trim()) return TELNYX_INFERENCE_BASE_URL;
   let url = baseUrl.trim().replace(/\/+$/, "");
-  if (url.endsWith(TELNYX_OPENAI_PATH)) {
-    url = url.slice(0, -TELNYX_OPENAI_PATH.length);
+  for (const suffix of [CHAT_COMPLETIONS_PATH, LEGACY_WEBCHAT_COMPLETIONS_PATH]) {
+    if (url.endsWith(suffix)) {
+      url = url.slice(0, -suffix.length);
+    }
   }
   return url;
 }
 
 /**
- * Curated subset of Telnyx-hosted models.
+ * Static snapshot of the Telnyx-hosted text model catalog observed from:
+ *   GET https://api.telnyx.com/v2/ai/models
  *
- * Full live catalog: GET https://api.telnyx.com/v2/ai/models.
+ * Keep this list aligned with the live catalog until OpenClaw provider catalog
+ * augmentation supports async provider-side model discovery.
  */
 export const TELNYX_DEFAULT_MODELS = [
+  "anthropic/claude-haiku-4-5",
+  "anthropic/claude-opus-4-6",
+  "google/gemini-2.5-flash",
+  "google/gemma-2b-it",
+  "Groq/gpt-oss-120b",
   "meta-llama/Meta-Llama-3.1-70B-Instruct",
   "meta-llama/Meta-Llama-3.1-8B-Instruct",
   "meta-llama/Llama-3.3-70B-Instruct",
-  "Qwen/Qwen3-235B-A22B",
-  "moonshotai/Kimi-K2.6",
-  "moonshotai/Kimi-K2.5",
   "MiniMaxAI/MiniMax-M2.7",
+  "moonshotai/Kimi-K2.5",
+  "moonshotai/Kimi-K2.6",
+  "openai/gpt-4.1",
+  "openai/gpt-4o",
+  "openai/gpt-4o-mini",
+  "openai/gpt-5",
+  "openai/gpt-5.1",
+  "openai/gpt-5.2",
+  "Qwen/Qwen3-235B-A22B",
   "zai-org/GLM-5.1-FP8",
-  "google/gemma-2b-it",
 ] as const;
 
 /**
@@ -88,7 +103,7 @@ function buildTelnyxAuthMethod() {
       choiceHint: "Open-weight LLMs via Telnyx AI",
       groupId: "telnyx",
       groupLabel: "Telnyx AI",
-      groupHint: "Native webchat completions — no proxy required",
+      groupHint: "Native chat completions — no proxy required",
     },
   });
 }

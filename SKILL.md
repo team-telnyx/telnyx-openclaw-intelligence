@@ -1,11 +1,11 @@
 # Telnyx Intelligence Provider (AIF-127)
 
-Native Telnyx AI text-inference plugin for OpenClaw. Registers the `telnyx` provider for webchat completions — no LiteLLM proxy needed.
+Native Telnyx AI text-inference plugin for OpenClaw. Registers the `telnyx` provider for OpenAI-compatible chat completions — no LiteLLM proxy needed.
 
 ## Install
 
 ```bash
-openclaw skills install ~/projects/telnyx-ocplatform-intelligence
+openclaw skills install ~/projects/telnyx-openclaw-intelligence
 ```
 
 ## Configure
@@ -23,10 +23,12 @@ export TELNYX_API_KEY="KEY_your_api_key_here"
 ## Key Models
 
 - `telnyx/meta-llama/Meta-Llama-3.1-70B-Instruct` (default)
-- `telnyx/meta-llama/Llama-4-Scout-17B-16E-Instruct`
-- `telnyx/deepseek-ai/DeepSeek-R1`
-- `telnyx/deepseek-ai/DeepSeek-V3`
+- `telnyx/openai/gpt-5`
+- `telnyx/anthropic/claude-opus-4-6`
+- `telnyx/google/gemini-2.5-flash`
+- `telnyx/Qwen/Qwen3-235B-A22B`
+- `telnyx/moonshotai/Kimi-K2.6`
 
 ## Source
 
-`~/projects/telnyx-ocplatform-intelligence`
+`~/projects/telnyx-openclaw-intelligence`

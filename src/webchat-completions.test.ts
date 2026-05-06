@@ -1,14 +1,10 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   normalizeTelnyxModelId,
-  buildTelnyxChatUrl,
-  resolveApiKey,
-  buildAuthHeader,
-  parseSseStream,
-  extractTextDelta,
   TELNYX_DEFAULT_MODEL,
   TELNYX_INFERENCE_BASE_URL,
 } from "./webchat-completions.js";
+import { normalizeTelnyxBaseUrl, TELNYX_DEFAULT_MODELS } from "./intelligence-provider.js";
 
 // ── Model name normalization ──────────────────────────────────────────
 
@@ -44,9 +40,7 @@ describe("normalizeTelnyxModelId", () => {
   });
 
   it("trims whitespace before processing", () => {
-    expect(normalizeTelnyxModelId("  telnyx/deepseek-ai/DeepSeek-R1  ")).toBe(
-      "deepseek-ai/DeepSeek-R1",
-    );
+    expect(normalizeTelnyxModelId("  telnyx/openai/gpt-5  ")).toBe("openai/gpt-5");
   });
 
   it("TELNYX_DEFAULT_MODEL is the expected value", () => {
@@ -54,169 +48,46 @@ describe("normalizeTelnyxModelId", () => {
   });
 });
 
-// ── Request URL construction ──────────────────────────────────────────
+// ── Base URL normalization ────────────────────────────────────────────
 
-describe("buildTelnyxChatUrl", () => {
-  it("uses the default base URL when no override is provided", () => {
-    const url = buildTelnyxChatUrl();
-    expect(url).toBe(`${TELNYX_INFERENCE_BASE_URL}/openai/webchat/completions`);
+describe("normalizeTelnyxBaseUrl", () => {
+  it("uses the Telnyx OpenAI-compatible base URL by default", () => {
+    expect(normalizeTelnyxBaseUrl()).toBe(TELNYX_INFERENCE_BASE_URL);
   });
 
-  it("uses a custom base URL when provided", () => {
-    const url = buildTelnyxChatUrl("https://api.example.com/v2/ai");
-    expect(url).toBe("https://api.example.com/v2/ai/openai/webchat/completions");
-  });
-
-  it("strips a trailing slash from the base URL", () => {
-    const url = buildTelnyxChatUrl("https://api.telnyx.com/v2/ai/");
-    expect(url).toBe("https://api.telnyx.com/v2/ai/openai/webchat/completions");
-  });
-});
-
-// ── Auth header construction ──────────────────────────────────────────
-
-describe("buildAuthHeader", () => {
-  it("builds a Bearer token header", () => {
-    expect(buildAuthHeader("test-api-key-123")).toBe("Bearer test-api-key-123");
-  });
-
-  it("does not double-wrap an existing Bearer token", () => {
-    // The raw key is passed, not pre-formatted — so we just wrap it
-    expect(buildAuthHeader("KEY_FOOBAR")).toBe("Bearer KEY_FOOBAR");
-  });
-});
-
-// ── API key resolution ────────────────────────────────────────────────
-
-describe("resolveApiKey", () => {
-  const origEnv = process.env["TELNYX_API_KEY"];
-
-  beforeEach(() => {
-    delete process.env["TELNYX_API_KEY"];
-  });
-
-  afterEach(() => {
-    if (origEnv !== undefined) {
-      process.env["TELNYX_API_KEY"] = origEnv;
-    } else {
-      delete process.env["TELNYX_API_KEY"];
-    }
-  });
-
-  it("returns the explicit apiKey when provided", () => {
-    expect(resolveApiKey({ apiKey: "explicit-key" })).toBe("explicit-key");
-  });
-
-  it("falls back to the TELNYX_API_KEY environment variable", () => {
-    process.env["TELNYX_API_KEY"] = "env-key";
-    expect(resolveApiKey({})).toBe("env-key");
-  });
-
-  it("throws when no key is available", () => {
-    expect(() => resolveApiKey({})).toThrow(/TELNYX_API_KEY/);
-  });
-
-  it("explicit key overrides the environment variable", () => {
-    process.env["TELNYX_API_KEY"] = "env-key";
-    expect(resolveApiKey({ apiKey: "explicit-key" })).toBe("explicit-key");
-  });
-});
-
-// ── SSE stream parsing ────────────────────────────────────────────────
-
-function makeStream(text: string): ReadableStream<Uint8Array> {
-  const encoder = new TextEncoder();
-  return new ReadableStream({
-    start(controller) {
-      controller.enqueue(encoder.encode(text));
-      controller.close();
-    },
-  });
-}
-
-describe("parseSseStream", () => {
-  it("parses a single SSE data line", async () => {
-    const stream = makeStream('data: {"choices":[{"delta":{"content":"Hello"}}]}\n\n');
-    const chunks: string[] = [];
-    for await (const chunk of parseSseStream(stream)) {
-      chunks.push(chunk.data);
-    }
-    expect(chunks).toHaveLength(1);
-    expect(chunks[0]).toContain('"Hello"');
-  });
-
-  it("stops on the [DONE] sentinel", async () => {
-    const stream = makeStream(
-      'data: {"choices":[{"delta":{"content":"Hi"}}]}\n\ndata: [DONE]\n\n',
+  it("preserves the OpenAI-compatible base URL", () => {
+    expect(normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai/openai")).toBe(
+      "https://api.telnyx.com/v2/ai/openai",
     );
-    const chunks: string[] = [];
-    for await (const chunk of parseSseStream(stream)) {
-      chunks.push(chunk.data);
-    }
-    expect(chunks).toHaveLength(1);
   });
 
-  it("skips comment lines (starting with ':')", async () => {
-    const stream = makeStream(': keep-alive\ndata: {"id":"1"}\n\n');
-    const chunks: string[] = [];
-    for await (const chunk of parseSseStream(stream)) {
-      chunks.push(chunk.data);
-    }
-    expect(chunks).toHaveLength(1);
-    expect(chunks[0]).toContain('"id":"1"');
+  it("strips the chat completions suffix when a full URL is provided", () => {
+    expect(
+      normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai/openai/chat/completions"),
+    ).toBe("https://api.telnyx.com/v2/ai/openai");
   });
 
-  it("handles empty stream gracefully", async () => {
-    const stream = makeStream("");
-    const chunks: string[] = [];
-    for await (const chunk of parseSseStream(stream)) {
-      chunks.push(chunk.data);
-    }
-    expect(chunks).toHaveLength(0);
+  it("strips the legacy webchat completions suffix when a full URL is provided", () => {
+    expect(
+      normalizeTelnyxBaseUrl("https://api.telnyx.com/v2/ai/openai/webchat/completions"),
+    ).toBe("https://api.telnyx.com/v2/ai/openai");
   });
 });
 
-// ── SSE delta extraction ──────────────────────────────────────────────
+// ── Catalog sanity ────────────────────────────────────────────────────
 
-describe("extractTextDelta", () => {
-  it("extracts text content from a valid delta chunk", () => {
-    const chunk = {
-      data: JSON.stringify({
-        choices: [{ delta: { content: "Hello, world!" }, finish_reason: null }],
-      }),
-    };
-    expect(extractTextDelta(chunk)).toBe("Hello, world!");
+describe("TELNYX_DEFAULT_MODELS", () => {
+  it("includes the live models reported during PR validation", () => {
+    expect(TELNYX_DEFAULT_MODELS).toContain("openai/gpt-5");
+    expect(TELNYX_DEFAULT_MODELS).toContain("openai/gpt-5.1");
+    expect(TELNYX_DEFAULT_MODELS).toContain("anthropic/claude-opus-4-6");
+    expect(TELNYX_DEFAULT_MODELS).toContain("google/gemini-2.5-flash");
+    expect(TELNYX_DEFAULT_MODELS).toContain("Groq/gpt-oss-120b");
   });
 
-  it("returns undefined for a finish chunk (null content)", () => {
-    const chunk = {
-      data: JSON.stringify({
-        choices: [{ delta: { content: null }, finish_reason: "stop" }],
-      }),
-    };
-    expect(extractTextDelta(chunk)).toBeUndefined();
-  });
-
-  it("returns undefined for a delta without content", () => {
-    const chunk = {
-      data: JSON.stringify({
-        choices: [{ delta: {}, finish_reason: null }],
-      }),
-    };
-    expect(extractTextDelta(chunk)).toBeUndefined();
-  });
-
-  it("returns undefined for malformed JSON", () => {
-    expect(extractTextDelta({ data: "not-json" })).toBeUndefined();
-  });
-
-  it("returns undefined for an empty choices array", () => {
-    const chunk = { data: JSON.stringify({ choices: [] }) };
-    expect(extractTextDelta(chunk)).toBeUndefined();
-  });
-
-  it("handles missing choices field", () => {
-    const chunk = { data: JSON.stringify({ id: "webchatcmpl-123" }) };
-    expect(extractTextDelta(chunk)).toBeUndefined();
+  it("does not advertise models missing from the live catalog", () => {
+    expect(TELNYX_DEFAULT_MODELS).not.toContain("deepseek-ai/DeepSeek-R1");
+    expect(TELNYX_DEFAULT_MODELS).not.toContain("deepseek-ai/DeepSeek-V3");
+    expect(TELNYX_DEFAULT_MODELS).not.toContain("meta-llama/Llama-4-Scout-17B-16E-Instruct");
   });
 });
