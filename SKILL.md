@@ -1,3 +1,24 @@
+---
+name: telnyx-openclaw-intelligence
+description: Add Telnyx as an OpenClaw text-inference provider with TELNYX_API_KEY auth and OpenAI-compatible webchat completions support.
+homepage: https://github.com/team-telnyx/telnyx-openclaw-intelligence
+metadata:
+  {
+    "openclaw": {
+      "emoji": "🧠",
+      "requires": { "env": ["TELNYX_API_KEY"] },
+      "install": [
+        {
+          "id": "github",
+          "kind": "github",
+          "package": "team-telnyx/telnyx-openclaw-intelligence",
+          "label": "Install the Telnyx intelligence OpenClaw plugin"
+        }
+      ]
+    }
+  }
+---
+
 # Telnyx Intelligence Provider (AIF-127)
 
 Native Telnyx AI text-inference plugin for OpenClaw. Registers the `telnyx` provider for OpenAI-compatible chat completions — no LiteLLM proxy needed.
