@@ -5,7 +5,15 @@ Native Telnyx AI text-inference plugin for OpenClaw. Registers the `telnyx` prov
 ## Install
 
 ```bash
-openclaw skills install ~/projects/telnyx-openclaw-intelligence
+openclaw plugins install /path/to/telnyx-openclaw-intelligence
+```
+
+Or from your project root:
+
+```bash
+cd ~/projects/telnyx-openclaw-intelligence
+npm install && npm run build
+openclaw plugins install .
 ```
 
 ## Configure
@@ -31,4 +39,4 @@ export TELNYX_API_KEY="KEY_your_api_key_here"
 
 ## Source
 
-`~/projects/telnyx-openclaw-intelligence`
+https://github.com/team-telnyx/telnyx-openclaw-intelligence
