@@ -1,6 +1,6 @@
 {
   "name": "telnyx-openclaw-intelligence",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Telnyx text-inference provider for OpenClaw — native OpenAI-compatible chat completions via Telnyx AI, no LiteLLM proxy needed",
   "type": "module",
   "main": "dist/index.js",
