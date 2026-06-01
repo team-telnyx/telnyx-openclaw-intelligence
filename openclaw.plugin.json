@@ -1,15 +1,21 @@
 {
-  "id": "telnyx-ocplatform-intelligence",
+  "id": "telnyx-intelligence",
   "name": "Telnyx Intelligence",
-  "description": "Telnyx text-inference provider for OpenClaw — native OpenAI-compatible chat completions via the Telnyx AI API. Just set TELNYX_API_KEY.",
+  "description": "Telnyx text-inference provider for OpenClaw \u2014 native OpenAI-compatible chat completions via the Telnyx AI API. Just set TELNYX_API_KEY.",
   "enabledByDefault": true,
-  "providers": ["telnyx"],
+  "providers": [
+    "telnyx"
+  ],
   "setup": {
     "providers": [
       {
         "id": "telnyx",
-        "authMethods": ["api-key"],
-        "envVars": ["TELNYX_API_KEY"]
+        "authMethods": [
+          "api-key"
+        ],
+        "envVars": [
+          "TELNYX_API_KEY"
+        ]
       }
     ]
   },
