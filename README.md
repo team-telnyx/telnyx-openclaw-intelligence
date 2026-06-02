@@ -13,7 +13,7 @@ Routes OpenAI-compatible chat completion requests directly to the [Telnyx AI Inf
 
 ## Demo
 
-Installing the plugin from scratch and running an OpenClaw agent on Telnyx-hosted models (Llama 3.1 70B → Qwen3 235B):
+Installing the plugin from scratch and running an OpenClaw agent on Telnyx-hosted models:
 
 https://github.com/team-telnyx/telnyx-openclaw-intelligence/raw/main/assets/telnyx-intelligence-demo.mp4
 
